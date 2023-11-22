@@ -1,0 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Mukta:wght@200;300;400;500;600;700;800&family=Noto+Sans+JP:wght@100;300;400;500;700;900&family=Oswald:wght@200;300;400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'DIN 2014';
+  src: url('DIN.OTF');
+  src: local('DIN 2014'), local('DIN 2014 Regular'), url('DIN.OTF');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DIN 2014';
+  src: url('DINBOLD.TTF');
+  src: local('DIN 2014'), local('DIN 2014 Bold'), url('DINBOLD.TTF');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?c1jbch');
+  src:  url('fonts/icomoon.eot?c1jbch#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?c1jbch') format('truetype'),
+    url('fonts/icomoon.woff?c1jbch') format('woff'),
+    url('fonts/icomoon.svg?c1jbch#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  font-family: 'icomoon' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  color: inherit;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-close::before {
+  content: "\e907";
+  color: inherit;
+}
+.icon-eye::before {
+  content: "\e908";
+  color: inherit;
+}
+.icon-eye-slash::before {
+  content: "\e909";
+  color: inherit;
+}
+.icon-plus::before {
+  content: "\e90a";
+  color: inherit;
+}
+.icon-building::before {
+  content: "\e900";
+  color: inherit;
+}
+.icon-carport::before {
+  content: "\e901";
+  color: inherit;
+}
+.icon-download::before {
+  content: "\e902";
+  color: inherit;
+}
+.icon-left::before {
+  content: "\e903";
+  color: inherit;
+}
+.icon-list::before {
+  content: "\e904";
+  color: inherit;
+}
+.icon-right::before {
+  content: "\e905";
+  color: inherit;
+}
+.icon-upload::before {
+  content: "\e906";
+  color: inherit;
+}
