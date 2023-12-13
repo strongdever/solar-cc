@@ -50,7 +50,11 @@ Route::group(['middleware' => ['auth', 'activated', 'activity', 'checkblocked']]
 // Registered and Activated User Routes
 Route::group(['middleware' => ['auth', 'activated', 'activity', 'twostep', 'checkblocked']], function () {
 
-    Route::get('/home', 'App\Http\Controllers\UserController@index')->name('home');
+    // Route::get('/home', 'App\Http\Controllers\UserController@index')->name('home');
+    Route::get('home', [
+        'as'   => 'home.show',
+        'uses' => 'App\Http\Controllers\UserController@index',
+    ]);
 
     // Show users profile.
     Route::get('store/{uuid}', [

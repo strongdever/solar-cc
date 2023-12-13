@@ -50,7 +50,7 @@
                             <li>
                                 <div class="input-group">
                                     <label for="company" class="label"><?php echo e(__('販売店名称')); ?></label>
-                                    <input type="text" class="form-control md<?php echo e($errors->has('company') ? ' is-invalid' : ''); ?>" name="company" value="<?php echo e($user->company); ?>" placeholder="例）株式会社株式会社ティーエムユニオン" autofocus>
+                                    <input type="text" class="form-control md<?php echo e($errors->has('company') ? ' is-invalid' : ''); ?>" name="company" value="<?php echo e($user->company); ?>" placeholder="例）株式会社カーポートソーラーシステム" autofocus>
                                     <?php if($errors->has('company')): ?>
                                         <p class="invalid-feedback"><?php echo e($errors->first('company')); ?></p>
                                     <?php endif; ?>

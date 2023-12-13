@@ -66,6 +66,7 @@
                 </div>
             </div>
             @endif
+            
             <h4 class="caption">{{ __('カーポート別 当月請求データ一覧') }}</h4>
             {!! Form::open(array('route' => 'invoice.show', 'method' => 'GET', 'role' => 'form', 'class' => 'requests-search-form needs-validation mb-30')) !!}
                 <div class="form-inner-row">

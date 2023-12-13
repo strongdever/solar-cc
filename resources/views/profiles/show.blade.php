@@ -46,7 +46,7 @@
                             <li>
                                 <div class="input-group">
                                     <label for="company" class="label">{{ __('販売店名称') }}</label>
-                                    <input type="text" class="form-control md{{ $errors->has('company') ? ' is-invalid' : '' }}" name="company" value="{{ $user->company }}" placeholder="例）株式会社株式会社ティーエムユニオン" autofocus>
+                                    <input type="text" class="form-control md{{ $errors->has('company') ? ' is-invalid' : '' }}" name="company" value="{{ $user->company }}" placeholder="例）株式会社カーポートソーラーシステム" autofocus>
                                     @if ($errors->has('company'))
                                         <p class="invalid-feedback">{{ $errors->first('company') }}</p>
                                     @endif
@@ -55,7 +55,7 @@
                             <li>
                                 <div class="input-group">
                                     <label for="zipcode" class="label">{{ __('郵便番号') }}</label>
-                                    <input type="text" class="form-control sd{{ $errors->has('zipcode') ? ' is-invalid' : '' }}" name="zipcode" value="{{ $user->zipcode }}" placeholder="例）310-0851">
+                                    <input type="text" class="form-control sd{{ $errors->has('zipcode') ? ' is-invalid' : '' }}" name="zipcode" value="{{ $user->zipcode }}" placeholder="例）123-4567">
                                     @if ($errors->has('zipcode'))
                                         <p class="invalid-feedback">{{ $errors->first('zipcode') }}</p>
                                     @endif
@@ -66,7 +66,7 @@
                                     <div class="form-col">
                                         <div class="input-group">
                                             <label for="address1" class="label">{{ __('住所1') }}</label>
-                                            <input type="text" class="form-control sm{{ $errors->has('address1') ? ' is-invalid' : '' }}" name="address1" value="{{ $user->address1 }}" placeholder="例）茨城県水戸市千波町1950">
+                                            <input type="text" class="form-control sm{{ $errors->has('address1') ? ' is-invalid' : '' }}" name="address1" value="{{ $user->address1 }}" placeholder="例）東京都新宿区西新宿2-8-1">
                                             @if ($errors->has('address1'))
                                                 <p class="invalid-feedback">{{ $errors->first('address1') }}</p>
                                             @endif
@@ -75,7 +75,7 @@
                                     <div class="form-col">
                                         <div class="input-group">
                                             <label for="address2" class="label">{{ __('住所2') }}</label>
-                                            <input type="text" class="form-control sm{{ $errors->has('address2') ? ' is-invalid' : '' }}" name="address2" value="{{ $user->address2 }}" placeholder="例）ウェーブ21ビル2F">
+                                            <input type="text" class="form-control sm{{ $errors->has('address2') ? ' is-invalid' : '' }}" name="address2" value="{{ $user->address2 }}" placeholder="例）西新宿ビル1階">
                                             @if ($errors->has('address2'))
                                                 <p class="invalid-feedback">{{ $errors->first('address2') }}</p>
                                             @endif
@@ -86,7 +86,7 @@
                             <li>
                                 <div class="input-group">
                                     <label for="phone" class="label">{{ __('連絡先') }}</label>
-                                    <input type="text" class="form-control sm{{ $errors->has('phone') ? ' is-invalid' : '' }}" name="phone" value="{{ $user->phone }}" placeholder="例）029-303-8581">
+                                    <input type="text" class="form-control sm{{ $errors->has('phone') ? ' is-invalid' : '' }}" name="phone" value="{{ $user->phone }}" placeholder="例）03-1234-5678">
                                     @if ($errors->has('phone'))
                                         <p class="invalid-feedback">{{ $errors->first('phone') }}</p>
                                     @endif

@@ -23,19 +23,19 @@
                                     <li>
                                         <div class="input-group">
                                             <label for="company" class="label">{{ __('発電所登録名') }}</label>
-                                            <input type="text" class="form-control md" name="company" placeholder="{{ __('例）カーポート株式会社') }}">
+                                            <input type="text" class="form-control md" name="company" placeholder="{{ __('例）株式会社カーポートソーラーシステム') }}">
                                         </div>
                                     </li>
                                     <li>
                                         <div class="input-group">
                                             <label for="name" class="label">{{ __('設置場所') }}</label>
-                                            <input type="text" class="form-control xs" name="address" placeholder="{{ __('例）茨城県水戸市千波町1950 ウェーブ21ビル2F') }}">
+                                            <input type="text" class="form-control xs" name="address" placeholder="{{ __('例）東京都新宿区西新宿2-8-1 西新宿ビル1階') }}">
                                         </div>
                                     </li>
                                     <li>
                                         <div class="input-group">
                                             <label for="phone" class="label">{{ __('電話番号') }}</label>
-                                            <input type="text" class="form-control sm" name="phone" placeholder="{{ __('例）029-303-8581') }}">
+                                            <input type="text" class="form-control sm" name="phone" placeholder="{{ __('例）03-1234-5678') }}">
                                         </div>
                                     </li>
                                     <li>
@@ -88,25 +88,25 @@
                                     <li>
                                         <div class="input-group">
                                             <label for="bill_name" class="label">{{ __('請求先名') }}</label>
-                                            <input type="text" class="form-control md" name="bill_name" placeholder="{{ __('例）カーポート株式会社') }}">
+                                            <input type="text" class="form-control md" name="bill_name" placeholder="{{ __('例）株式会社カーポートソーラーシステム') }}">
                                         </div>
                                     </li>
                                     <li>
                                         <div class="input-group">
                                             <label for="bill_zipcode" class="label">{{ __('請求先郵便番号') }}</label>
-                                            <input type="text" class="form-control sd" name="bill_zipcode" placeholder="{{ __('例）310-0851') }}">
+                                            <input type="text" class="form-control sd" name="bill_zipcode" placeholder="{{ __('例）123-4567') }}">
                                         </div>
                                     </li>
                                     <li>
                                         <div class="input-group">
                                             <label for="bill_address1" class="label">{{ __('請求先住所1') }}</label>
-                                            <input type="text" class="form-control xs" name="bill_address1" placeholder="{{ __('例）茨城県水戸市千波町1950') }}">
+                                            <input type="text" class="form-control xs" name="bill_address1" placeholder="{{ __('例）東京都新宿区西新宿2-8-1') }}">
                                         </div>
                                     </li>
                                     <li>
                                         <div class="input-group">
                                             <label for="bill_address2" class="label">{{ __('請求先住所2') }}</label>
-                                            <input type="text" class="form-control xs" name="bill_address2" placeholder="{{ __('例）ウェーブ21ビル2F') }}">
+                                            <input type="text" class="form-control xs" name="bill_address2" placeholder="{{ __('例）西新宿ビル1階') }}">
                                         </div>
                                     </li>
                                 </ul>

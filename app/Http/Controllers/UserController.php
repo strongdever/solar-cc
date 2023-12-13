@@ -38,21 +38,19 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $currentUser = Auth::user();
 
         $latestInvoices = [];
         $latestInvoiceData = [];
         $powerInvoices = [];
-        
-        $latestCSVFile = File::where('user_id', $currentUser->id)->orderBy('id','DESC')->first();
-        
-        if( $latestCSVFile !== null ) {
+        $latestCSVFile = File::where('user_id', $currentUser->id)->orderBy('id', 'DESC')->first();
+        if ($latestCSVFile !== null) {
             $maxDate = "";
             $maxDateQuery = DayPower::query();
             $maxDateQuery->where('user_id', $currentUser->id)->where('file_id', $latestCSVFile->id);
-            if( $currentUser->term->deadline == 30 ) {
+            if ($currentUser->term->deadline == 30) {
                 $maxDate = $maxDateQuery->max(DB::raw('DATE_ADD(measured_at, INTERVAL 1 MONTH)'));
             } else {
                 $maxDate = $maxDateQuery->max(DB::raw('DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH)'));
@@ -63,27 +61,27 @@ class UserController extends Controller
 
             $latestInvoicesQuery = DayPower::query();
 
-            if( $maxYear && $maxMonth ) {
-                if( $currentUser->term->deadline == 30 ) {
+            if ($maxYear && $maxMonth) {
+                if ($currentUser->term->deadline == 30) {
                     $latestInvoicesQuery->select('id', DB::raw('COUNT(id) AS count'), 'uuid', 'company', 'user_id', 'carport_id', 'file_id', DB::raw('SUM(used_amount) AS used_amount'), DB::raw('SUM(generated_amount) AS generated_amount'), DB::raw('SUM(purchased_amount) AS purchased_amount'), DB::raw('SUM(solded_amount) AS solded_amount'), DB::raw('SUM(self_amount) AS self_amount'), 'purchase_method', DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH)) AS year'), DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH)) AS month'))
-                                        ->where('user_id', $currentUser->id)
-                                        ->where('file_id', $latestCSVFile->id)
-                                        ->where(DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $maxYear)
-                                        ->where(DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $maxMonth)
-                                        ->groupBy('file_id', 'uuid', DB::raw('MONTH(measured_at)'), DB::raw('YEAR(measured_at)'));
+                        ->where('user_id', $currentUser->id)
+                        ->where('file_id', $latestCSVFile->id)
+                        ->where(DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $maxYear)
+                        ->where(DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $maxMonth)
+                        ->groupBy('file_id', 'uuid', DB::raw('MONTH(measured_at)'), DB::raw('YEAR(measured_at)'));
                 } else {
                     $latestInvoicesQuery->select('id', DB::raw('COUNT(id) AS count'), 'uuid', 'company', 'user_id', 'carport_id', 'file_id', DB::raw('SUM(used_amount) AS used_amount'), DB::raw('SUM(generated_amount) AS generated_amount'), DB::raw('SUM(purchased_amount) AS purchased_amount'), DB::raw('SUM(solded_amount) AS solded_amount'), DB::raw('SUM(self_amount) AS self_amount'), 'purchase_method', DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH)) AS year'), DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH)) AS month'))
-                                        ->where('user_id', $currentUser->id)
-                                        ->where('file_id', $latestCSVFile->id)
-                                        ->where(DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $maxYear)
-                                        ->where(DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $maxMonth)
-                                        ->groupBy('file_id', 'uuid', DB::raw('MONTH(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'), DB::raw('YEAR(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'));
+                        ->where('user_id', $currentUser->id)
+                        ->where('file_id', $latestCSVFile->id)
+                        ->where(DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $maxYear)
+                        ->where(DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $maxMonth)
+                        ->groupBy('file_id', 'uuid', DB::raw('MONTH(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'), DB::raw('YEAR(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'));
                 }
             }
 
             $latestInvoicesQuery->orderBy('file_id', 'DESC')
-                                ->orderBy('year', 'DESC')
-                                ->orderBy('month', 'DESC');
+                ->orderBy('year', 'DESC')
+                ->orderBy('month', 'DESC');
 
             $latestInvoices = $latestInvoicesQuery->get();
 
@@ -97,9 +95,9 @@ class UserController extends Controller
             foreach ($latestInvoices as $invoiceItem) {
                 $latestInvoiceData['count'] += $invoiceItem->count;
                 $latestInvoiceData['amount'] += $invoiceItem->used_amount;
-                $latestInvoiceData['price'] += round( $invoiceItem->used_amount * $invoiceItem->carport->unit_price, 2 );
+                $latestInvoiceData['price'] += round($invoiceItem->used_amount * $invoiceItem->carport->unit_price, 2);
                 $feeValueSum = 0.0;
-                foreach( $invoiceItem->carport->fee->get_data() as $feeItem ) {
+                foreach ($invoiceItem->carport->fee->get_data() as $feeItem) {
                     $feeValueSum += $feeItem->value;
                 }
                 $latestInvoiceData['price'] += $feeValueSum;
@@ -107,30 +105,35 @@ class UserController extends Controller
                 $latestInvoiceUuids[] = $invoiceItem->user->id . '_' . $invoiceItem->file_id . '_' . $invoiceItem->carport_id . '_' . $invoiceItem->year . '_' . $invoiceItem->month;
             }
 
-            $latestInvoiceData['uuidJson'] = json_encode( $latestInvoiceUuids );
+            $latestInvoiceData['uuidJson'] = json_encode($latestInvoiceUuids);
 
             $powerInvoicesQuery = DayPower::query();
 
-            if( $currentUser->term->deadline == 30 ) {
+            if ($currentUser->term->deadline == 30) {
                 $powerInvoicesQuery->select('id', DB::raw('COUNT(id) AS count'), 'uuid', 'company', 'user_id', 'carport_id', 'file_id', DB::raw('SUM(used_amount) AS used_amount'), DB::raw('SUM(generated_amount) AS generated_amount'), DB::raw('SUM(purchased_amount) AS purchased_amount'), DB::raw('SUM(solded_amount) AS solded_amount'), DB::raw('SUM(self_amount) AS self_amount'), 'purchase_method', DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH)) AS year'), DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH)) AS month'));
             } else {
                 $powerInvoicesQuery->select('id', DB::raw('COUNT(id) AS count'), 'uuid', 'company', 'user_id', 'carport_id', 'file_id', DB::raw('SUM(used_amount) AS used_amount'), DB::raw('SUM(generated_amount) AS generated_amount'), DB::raw('SUM(purchased_amount) AS purchased_amount'), DB::raw('SUM(solded_amount) AS solded_amount'), DB::raw('SUM(self_amount) AS self_amount'), 'purchase_method', DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))  AS year'), DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH)) AS month'));
             }
 
-            if( $currentUser->term->deadline == 30 ) {
+            if ($currentUser->term->deadline == 30) {
                 $powerInvoicesQuery->groupBy('file_id', 'uuid', DB::raw('MONTH(measured_at)'), DB::raw('YEAR(measured_at)'));
             } else {
                 $powerInvoicesQuery->groupBy('file_id', 'uuid', DB::raw('MONTH(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'), DB::raw('YEAR(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'));
             }
-
-            $powerInvoicesQuery->orderBy('file_id', 'DESC')
-                               ->orderBy('year', 'DESC')
-                               ->orderBy('month', 'DESC');
+            $powerInvoicesQuery->where('user_id', $currentUser->id)
+                ->orderBy('file_id', 'DESC')
+                ->orderBy('year', 'DESC')
+                ->orderBy('month', 'DESC');
 
             $powerInvoices = $powerInvoicesQuery->paginate(6);
         }
 
-        return view('pages.user.home', compact('latestInvoiceData', 'powerInvoices'));
+        $result = $this->GetInvoice($request);
+        $invoiceIDs = $result['invoiceIDs'];
+        $searchData = $result['searchData'];
+        $selectedInvoiceData = $result['selectedInvoiceData'];
+
+        return view('pages.user.home', compact('latestInvoiceData', 'invoiceIDs', 'searchData', 'selectedInvoiceData', 'powerInvoices'));
     }
 
     /**
@@ -147,30 +150,26 @@ class UserController extends Controller
 
         $currentUser = Auth::user();
         $carportsQuery = Carport::query();
-        
-        if( $request->keyword ) {
+
+        if ($request->keyword) {
             $keyword = $request->keyword;
-            $carportsQuery->where('uuid', 'like', '%'.$keyword.'%')
-                          ->orWhere('company', 'like', '%'.$keyword.'%')
-                          ->orWhere('address', 'like', '%'.$keyword.'%');
+            $carportsQuery->where('uuid', 'like', '%' . $keyword . '%')
+                ->orWhere('company', 'like', '%' . $keyword . '%')
+                ->orWhere('address', 'like', '%' . $keyword . '%');
         }
 
-        if( $request->contract_type_id ) {
-            $contract_type_id = (int)$request->contract_type_id;
+        if ($request->contract_type_id) {
+            $contract_type_id = (int) $request->contract_type_id;
             $carportsQuery->where('contract_type_id', $contract_type_id);
         }
 
-        $carports = $carportsQuery->paginate(20);
+        $carports = $carportsQuery->where('user_id', $currentUser->id)->paginate(20);
 
         return view('pages.user.carport', compact('searchData', 'carports'));
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function invoiceShow(Request $request)
+    //getting invoiceIDs, searchData, selectedInvoiceData
+    private function GetInvoice(Request $request)
     {
         $searchData = [
             'keyword' => $request->keyword,
@@ -178,7 +177,7 @@ class UserController extends Controller
             'month' => $request->month,
             'invoice_id' => $request->invoice_id,
         ];
-        
+
         $currentUser = Auth::user();
 
         $maxYear = Carbon::now()->year;
@@ -187,7 +186,7 @@ class UserController extends Controller
         $minDate = Carbon::now()->format('Y-m-d');
 
         $minDateQuery = DayPower::query();
-        if( $currentUser->term->deadline == 30 ) {
+        if ($currentUser->term->deadline == 30) {
             $minDate = $minDateQuery->min(DB::raw('DATE_ADD(measured_at, INTERVAL 1 MONTH)'));
         } else {
             $minDate = $minDateQuery->min(DB::raw('DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH)'));
@@ -208,7 +207,7 @@ class UserController extends Controller
             $invoiceIDs[] = $start->format('Y-n');
         }
 
-        $invoiceIDs = array_reverse( $invoiceIDs );
+        $invoiceIDs = array_reverse($invoiceIDs);
 
         $selectedInvoiceID = $request->invoice_id ? $request->invoice_id : Carbon::now()->format('Y-n');
 
@@ -220,37 +219,37 @@ class UserController extends Controller
 
         $selectedInvoicesQuery = DayPower::query();
 
-        if( $currentUser->term->deadline == 30 ) {
+        if ($currentUser->term->deadline == 30) {
             $selectedInvoicesQuery->select('id', DB::raw('COUNT(id) AS count'), 'uuid', 'company', 'measured_at', 'user_id', 'carport_id', 'file_id', DB::raw('SUM(used_amount) AS used_amount'), DB::raw('SUM(generated_amount) AS generated_amount'), DB::raw('SUM(purchased_amount) AS purchased_amount'), DB::raw('SUM(solded_amount) AS solded_amount'), DB::raw('SUM(self_amount) AS self_amount'), 'purchase_method', DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH)) AS year'), DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH)) AS month'))
-                                ->whereIn('id', $mergedInvoiceIds)
-                                ->where('user_id', $currentUser->id)
-                                ->where(DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $selectedYear)
-                                ->where(DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $selectedMonth)
-                                ->groupBy('uuid', 'carport_id', DB::raw('MONTH(measured_at)'), DB::raw('YEAR(measured_at)'));
+                ->whereIn('id', $mergedInvoiceIds)
+                ->where('user_id', $currentUser->id)
+                ->where(DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $selectedYear)
+                ->where(DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $selectedMonth)
+                ->groupBy('uuid', 'carport_id', DB::raw('MONTH(measured_at)'), DB::raw('YEAR(measured_at)'));
         } else {
             $selectedInvoicesQuery->select('id', DB::raw('COUNT(id) AS count'), 'uuid', 'company', 'user_id', 'carport_id', 'file_id', DB::raw('SUM(used_amount) AS used_amount'), DB::raw('SUM(generated_amount) AS generated_amount'), DB::raw('SUM(purchased_amount) AS purchased_amount'), DB::raw('SUM(solded_amount) AS solded_amount'), DB::raw('SUM(self_amount) AS self_amount'), 'purchase_method', DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH)) AS year'), DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH)) AS month'))
-                                ->whereIn('id', $mergedInvoiceIds)
-                                ->where('user_id', $currentUser->id)
-                                ->where(DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $selectedYear)
-                                ->where(DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $selectedMonth)
-                                ->groupBy('uuid', 'carport_id', DB::raw('MONTH(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'), DB::raw('YEAR(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'));
+                ->whereIn('id', $mergedInvoiceIds)
+                ->where('user_id', $currentUser->id)
+                ->where(DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $selectedYear)
+                ->where(DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $selectedMonth)
+                ->groupBy('uuid', 'carport_id', DB::raw('MONTH(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'), DB::raw('YEAR(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'));
         }
 
         $selectedInvoicesQuery->orderBy('year', 'DESC')
-                              ->orderBy('month', 'DESC');
-        
+            ->orderBy('month', 'DESC');
+
         $selectedInvoices = $selectedInvoicesQuery->get();
-        
+
         $tempTotalCount = 0;
         $tempTotalAmount = 0.0;
         $tempTotalUuids = [];
         $tempTotalPrice = 0.0;
 
         foreach ($selectedInvoices as $invoiceItem) {
-            $tempTotalCount ++;
+            $tempTotalCount++;
             $tempTotalAmount += $invoiceItem->used_amount;
             $tempTotalPrice += $invoiceItem->used_amount * $invoiceItem->carport->unit_price;
-            foreach( $invoiceItem->carport->fee->get_data() as $feeItem ) {
+            foreach ($invoiceItem->carport->fee->get_data() as $feeItem) {
                 $tempTotalPrice += $feeItem->value;
             }
             $tempTotalUuids[] = $invoiceItem->user->id . '_' . $invoiceItem->file_id . '_' . $invoiceItem->carport_id . '_' . $invoiceItem->year . '_' . $invoiceItem->month;
@@ -261,52 +260,75 @@ class UserController extends Controller
         $selectedInvoiceData['count'] = $tempTotalCount;
         $selectedInvoiceData['amount'] = $tempTotalAmount;
         $selectedInvoiceData['price'] = round($tempTotalPrice, 2);
-        $selectedInvoiceData['uuidJson'] = json_encode( $tempTotalUuids );
+        $selectedInvoiceData['uuidJson'] = json_encode($tempTotalUuids);
+
+        return [
+            'invoiceIDs' => $invoiceIDs,
+            'searchData' => $searchData,
+            'selectedInvoiceData' => $selectedInvoiceData,
+        ];
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function invoiceShow(Request $request)
+    {
+        $result = $this->GetInvoice($request);
+        $invoiceIDs = $result['invoiceIDs'];
+        $searchData = $result['searchData'];
+        $selectedInvoiceData = $result['selectedInvoiceData'];
+
+        $currentUser = Auth::user();
 
         $powerInvoicesQuery = DayPower::query();
 
-        if( $currentUser->term->deadline == 30 ) {
+        if ($currentUser->term->deadline == 30) {
             $powerInvoicesQuery->select('id', DB::raw('COUNT(id) AS count'), 'uuid', 'company', 'user_id', 'carport_id', 'file_id', DB::raw('SUM(used_amount) AS used_amount'), DB::raw('SUM(generated_amount) AS generated_amount'), DB::raw('SUM(purchased_amount) AS purchased_amount'), DB::raw('SUM(solded_amount) AS solded_amount'), DB::raw('SUM(self_amount) AS self_amount'), 'purchase_method', DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH)) AS year'), DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH)) AS month'));
         } else {
             $powerInvoicesQuery->select('id', DB::raw('COUNT(id) AS count'), 'uuid', 'company', 'user_id', 'carport_id', 'file_id', DB::raw('SUM(used_amount) AS used_amount'), DB::raw('SUM(generated_amount) AS generated_amount'), DB::raw('SUM(purchased_amount) AS purchased_amount'), DB::raw('SUM(solded_amount) AS solded_amount'), DB::raw('SUM(self_amount) AS self_amount'), 'purchase_method', DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))  AS year'), DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH)) AS month'));
         }
 
+        $mergedInvoiceIds = DayPower::query()->groupBy('uuid', 'user_id', 'carport_id', 'measured_at')->pluck('id')->toArray();
         $powerInvoicesQuery->whereIn('id', $mergedInvoiceIds);
 
-        if($request->keyword) {
+        if ($request->keyword) {
             $keyword = $request->keyword;
-            $powerInvoicesQuery->where('uuid', 'like', '%'.$keyword.'%');
-            $powerInvoicesQuery->orWhereHas('carport', function($query) use ($keyword) {
-                $query->where('company', 'like', '%'.$keyword.'%')->orWhere('address', 'like', '%'.$keyword.'%');
+            $powerInvoicesQuery->where('uuid', 'like', '%' . $keyword . '%');
+            $powerInvoicesQuery->orWhereHas('carport', function ($query) use ($keyword) {
+                $query->where('company', 'like', '%' . $keyword . '%')->orWhere('address', 'like', '%' . $keyword . '%');
             });
         }
 
-        if( $request->year ) {
-            $year = (int)$request->year;
-            if( $currentUser->term->deadline == 30 ) {
+        if ($request->year) {
+            $year = (int) $request->year;
+            if ($currentUser->term->deadline == 30) {
                 $powerInvoicesQuery->where(DB::raw('YEAR(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $year);
             } else {
                 $powerInvoicesQuery->where(DB::raw('YEAR(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $year);
             }
         }
 
-        if( $request->month ) {
-            $month = (int)$request->month;
-            if( $currentUser->term->deadline == 30 ) {
+        if ($request->month) {
+            $month = (int) $request->month;
+            if ($currentUser->term->deadline == 30) {
                 $powerInvoicesQuery->where(DB::raw('MONTH(DATE_ADD(measured_at, INTERVAL 1 MONTH))'), $month);
             } else {
                 $powerInvoicesQuery->where(DB::raw('MONTH(DATE_ADD(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY), INTERVAL 1 MONTH))'), $month);
             }
         }
 
-        if( $currentUser->term->deadline == 30 ) {
+        if ($currentUser->term->deadline == 30) {
             $powerInvoicesQuery->groupBy('uuid', 'carport_id', DB::raw('MONTH(measured_at)'), DB::raw('YEAR(measured_at)'));
         } else {
             $powerInvoicesQuery->groupBy('uuid', 'carport_id', DB::raw('MONTH(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'), DB::raw('YEAR(DATE_SUB(measured_at, INTERVAL ' . $currentUser->term->deadline . ' DAY))'));
         }
 
-        $powerInvoicesQuery->orderBy('year', 'DESC')
-                           ->orderBy('month', 'DESC');
+        $powerInvoicesQuery->where('user_id', $currentUser->id)
+            ->orderBy('year', 'DESC')
+            ->orderBy('month', 'DESC');
 
         $powerInvoices = $powerInvoicesQuery->paginate(20);
 
@@ -320,8 +342,8 @@ class UserController extends Controller
      */
     public function powerInvoiceExport(Request $request)
     {
-        $csvfile = $this->InvoiceCSVStore( $request );
-        
+        $csvfile = $this->InvoiceCSVStore($request);
+
         return response()->download(storage_path('app/' . $csvfile));
     }
 
@@ -335,7 +357,7 @@ class UserController extends Controller
         $data = [];
         $powerInvoice = $powerInvoiceData['powerData'];
         $invoiceComment = $powerInvoiceData['comment'];
-        
+
         $billTotalPrice = 0;
 
         $firstRowData = [
@@ -362,10 +384,10 @@ class UserController extends Controller
             $powerInvoice->user->bank->name . ' ' . $powerInvoice->user->bank->branch . ' ' . $powerInvoice->user->bank->number,
             '内税',
             '自家消費電力',
-            '¥'.$powerInvoice->carport->unit_price,
+            '¥' . $powerInvoice->carport->unit_price,
             $powerInvoice->used_amount,
             'kWh',
-            '¥'.round( $powerInvoice->used_amount * $powerInvoice->carport->unit_price, 0 ),
+            '¥' . round($powerInvoice->used_amount * $powerInvoice->carport->unit_price, 0),
             '',
         ];
 
@@ -400,15 +422,15 @@ class UserController extends Controller
                 '',
                 '内税',
                 $feeData->name,
-                '¥'.$feeData->value,
+                '¥' . $feeData->value,
                 '1',
                 $feeData->unit,
-                '¥'. $feeData->value,
+                '¥' . $feeData->value,
                 '',
             ];
 
             $data[] = $rowData;
-            $billTotalPrice += (float)$feeData->value;
+            $billTotalPrice += (float) $feeData->value;
         }
 
         $lastRowData = [
@@ -438,17 +460,17 @@ class UserController extends Controller
             '',
             '',
             '',
-            '¥'.round( $billTotalPrice, 0 ),
+            '¥' . round($billTotalPrice, 0),
             '',
         ];
         $data[] = $lastRowData;
 
-        $file_name = 'invoice_'.$powerInvoice->carport->uuid.'_'.date('Y-m-d').'_'.time().'.csv';
+        $file_name = 'invoice_' . $powerInvoice->carport->uuid . '_' . date('Y-m-d') . '_' . time() . '.csv';
 
         Excel::store(new InvoiceExport($data), $file_name, '', \Maatwebsite\Excel\Excel::CSV);
 
         return $file_name;
-        
+
     }
 
     /**
@@ -459,8 +481,8 @@ class UserController extends Controller
     public function powerRegister()
     {
         $currentUser = Auth::user();
-        $dayPowers = DayPower::where('user_id',$currentUser->id)->orderBy('id','desc')->paginate(20);
-        $files = File::where('user_id', $currentUser->id)->orderBy('id','desc')->paginate(20);
+        $dayPowers = DayPower::where('user_id', $currentUser->id)->orderBy('id', 'desc')->paginate(20);
+        $files = File::where('user_id', $currentUser->id)->orderBy('id', 'desc')->paginate(20);
 
         return view('pages.user.power-register', compact('files'));
     }
@@ -480,7 +502,7 @@ class UserController extends Controller
                 'company' => 'required|max:255',
                 'address' => 'required|max:255',
                 'phone' => 'required|min:10',
-                'email' => 'required|email|max:255',
+                'email' => 'required|email|max:255|unique:carports',
                 'manager' => 'required|max:255',
                 'contract_type_id' => 'required',
                 'started_at' => 'required|date_format:Y年m月d日|max:255',
@@ -527,8 +549,8 @@ class UserController extends Controller
             'contract_type_id' => $request->input('contract_type_id'),
             'started_at' => Carbon::createFromFormat('Y年m月d日', $request->input('started_at'))->startOfDay()->format('Y-m-d H:i:s'),
             'registered_at' => Carbon::now(),
-            'unit_price' => (float)$request->input('unit_price'),
-            'user_id'=> Auth::user()->id,
+            'unit_price' => (float) $request->input('unit_price'),
+            'user_id' => Auth::user()->id,
             'signup_ip_address' => $ipAddress->getClientIp(),
         ]);
 
@@ -538,8 +560,8 @@ class UserController extends Controller
         $fee_value_arr = $request->input('fee_value');
         $fee_comment = $request->input('fee_comment');
         $fee_arr = [];
-        for ($i=0; $i < count($fee_name_arr); $i++) { 
-            if( $fee_name_arr[$i] ) {
+        for ($i = 0; $i < count($fee_name_arr); $i++) {
+            if ($fee_name_arr[$i]) {
                 $item = [
                     'name' => $fee_name_arr[$i],
                     'unit' => $fee_unit_arr[$i],
@@ -549,7 +571,7 @@ class UserController extends Controller
             }
         }
         $fee->fill([
-            'data' => json_encode( $fee_arr ),
+            'data' => json_encode($fee_arr),
             'comment' => $fee_comment
         ]);
 
@@ -564,7 +586,7 @@ class UserController extends Controller
             'address2' => $request->input('bill_address2'),
         ];
 
-        $bill->fill( $bill_input );
+        $bill->fill($bill_input);
 
         $carport->bill()->save($bill);
 
@@ -601,9 +623,9 @@ class UserController extends Controller
             $data['success'] = false;
             $data['error'] = $validator->errors()->first('file');
         } else {
-            if($request->file('file')) {
+            if ($request->file('file')) {
                 $file = $request->file('file');
-                $filename = time().'_'.$file->getClientOriginalName();
+                $filename = time() . '_' . $file->getClientOriginalName();
 
                 // File upload location
                 $location = public_path('uploads/');
@@ -611,7 +633,7 @@ class UserController extends Controller
                 // Upload file
                 $file->move($location, $filename);
 
-                
+
 
                 $file = new File();
                 $file->name = $filename;
@@ -621,7 +643,7 @@ class UserController extends Controller
                 $file->save();
 
                 try {
-                    Excel::import(new ImportData($file->id ), $location.$filename);
+                    Excel::import(new ImportData($file->id), $location . $filename);
 
                     // Response
                     $data['success'] = true;
@@ -639,7 +661,7 @@ class UserController extends Controller
             } else {
                 // Response
                 $data['success'] = false;
-                $data['message'] = 'ファイルがアップロードされていません。'; 
+                $data['message'] = 'ファイルがアップロードされていません。';
             }
         }
 
@@ -706,8 +728,8 @@ class UserController extends Controller
             'email' => $request->input('email'),
             'manager' => $request->input('manager'),
             'contract_type_id' => $request->input('contract_type_id'),
-            'unit_price' => (float)$request->input('unit_price'),
-            'user_id'=> Auth::user()->id,
+            'unit_price' => (float) $request->input('unit_price'),
+            'user_id' => Auth::user()->id,
             'updated_ip_address' => $ipAddress->getClientIp(),
         ]);
 
@@ -716,8 +738,8 @@ class UserController extends Controller
         $fee_value_arr = $request->input('fee_value');
         $fee_comment = $request->input('fee_comment');
         $fee_arr = [];
-        for ($i=0; $i < count($fee_name_arr); $i++) { 
-            if( $fee_name_arr[$i] ) {
+        for ($i = 0; $i < count($fee_name_arr); $i++) {
+            if ($fee_name_arr[$i]) {
                 $item = [
                     'name' => $fee_name_arr[$i],
                     'unit' => $fee_unit_arr[$i],
@@ -728,7 +750,7 @@ class UserController extends Controller
         }
 
         $fill_input = [
-            'data' => json_encode( $fee_arr ),
+            'data' => json_encode($fee_arr),
             'comment' => $fee_comment
         ];
 
@@ -767,7 +789,7 @@ class UserController extends Controller
     public function invoiceUpdate(Request $request)
     {
         $uuid = $request->uuid;
-        
+
         $invoice = Invoice::updateOrCreate(
             ['uuid' => $uuid],
             [
@@ -805,7 +827,7 @@ class UserController extends Controller
 
         $powerInvoice = $invoice->get_data();
 
-        $filename = $this->InvoiceCSVStore( $powerInvoice );
+        $filename = $this->InvoiceCSVStore($powerInvoice);
 
         return response()->download(storage_path('app/' . $filename));
     }
@@ -819,12 +841,21 @@ class UserController extends Controller
     public function invoiceZipfile(Request $request)
     {
         $uuidJson = $request->uuidsJson;
-        $uuids = json_decode( $uuidJson );
+
+        // Check if $uuidJson is empty
+        if ( $uuidJson == '[]' ) {
+            // Handle the exception when $uuidJson is empty
+            // For example, you can redirect back with an error message
+            return redirect()->back()->with('error', '請求データが登録されていません');
+        }
+
+        $uuids = json_decode($uuidJson);
 
         $data = [];
 
         foreach ($uuids as $uuid) {
             $params = explode('_', $uuid);
+
             $invoice = Invoice::updateOrCreate(
                 ['uuid' => $uuid],
                 [
@@ -836,10 +867,10 @@ class UserController extends Controller
                 ]
             );
             $powerInvoiceData = $invoice->get_data();
-            
+
             $powerInvoice = $powerInvoiceData['powerData'];
             $invoiceComment = $powerInvoiceData['comment'];
-            
+
             $billTotalPrice = 0;
 
             $firstRowData = [
@@ -866,13 +897,12 @@ class UserController extends Controller
                 $powerInvoice->user->bank->name . ' ' . $powerInvoice->user->bank->branch . ' ' . $powerInvoice->user->bank->number,
                 '内税',
                 '自家消費電力',
-                '¥'.$powerInvoice->carport->unit_price,
+                '¥' . $powerInvoice->carport->unit_price,
                 $powerInvoice->used_amount,
                 'kWh',
-                '¥'.round( $powerInvoice->used_amount * $powerInvoice->carport->unit_price, 0 ),
+                '¥' . round($powerInvoice->used_amount * $powerInvoice->carport->unit_price, 0),
                 '',
             ];
-
             $billTotalPrice += round($powerInvoice->used_amount * $powerInvoice->carport->unit_price, 0);
 
             $data[] = $firstRowData;
@@ -904,15 +934,15 @@ class UserController extends Controller
                     '',
                     '内税',
                     $feeData->name,
-                    '¥'.$feeData->value,
+                    '¥' . $feeData->value,
                     '1',
                     $feeData->unit,
-                    '¥'. $feeData->value,
+                    '¥' . $feeData->value,
                     '',
                 ];
 
                 $data[] = $rowData;
-                $billTotalPrice += (float)$feeData->value;
+                $billTotalPrice += (float) $feeData->value;
             }
 
             $lastRowData = [
@@ -942,7 +972,7 @@ class UserController extends Controller
                 '',
                 '',
                 '',
-                '¥'.round( $billTotalPrice, 0 ),
+                '¥' . round($billTotalPrice, 0),
                 '',
             ];
 
@@ -950,7 +980,7 @@ class UserController extends Controller
 
         }
 
-        $file_name = 'invoice('.$params[3].'-'.$params[4].')_'.date('Y-m-d').'_'.time().'.csv';
+        $file_name = 'invoice(' . $params[3] . '-' . $params[4] . ')_' . date('Y-m-d') . '_' . time() . '.csv';
 
         Excel::store(new InvoiceExport($data), $file_name, '', \Maatwebsite\Excel\Excel::CSV);
 
@@ -965,7 +995,7 @@ class UserController extends Controller
      */
     public function ajaxCarportShow(Request $request)
     {
-        if( $request->input('id') ) {
+        if ($request->input('id')) {
             $carport_id = $request->input('id');
             $carport = Carport::findOrFail($carport_id);
             return view('modals.carport-detail-template', compact('carport'));
@@ -986,13 +1016,13 @@ class UserController extends Controller
 
         $carports_query = Carport::query();
 
-        if( !empty( $keyword ) ) {
-            $carports_query->where('uuid', 'like', '%'.$keyword.'%')
-                            ->orWhere('company', 'like', '%'.$keyword.'%')
-                            ->orWhere('address', 'like', '%'.$keyword.'%');
+        if (!empty($keyword)) {
+            $carports_query->where('uuid', 'like', '%' . $keyword . '%')
+                ->orWhere('company', 'like', '%' . $keyword . '%')
+                ->orWhere('address', 'like', '%' . $keyword . '%');
         }
 
-        if( !empty( $contract_type_id ) ) {
+        if (!empty($contract_type_id)) {
             $carports_query->where('contract_type_id', $contract_type_id);
         }
 

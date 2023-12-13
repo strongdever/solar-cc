@@ -23,6 +23,10 @@
         <link rel="stylesheet" href="{{ asset('assets/css/common.css') }}">
         <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
+        <link rel="shortcut icon" href="{{ asset('assets/img/favicon.svg') }}">
+        <link rel="icon" type="image/png" href="{{ asset('assets/img/favicon.svg') }}">
+        <link rel="apple-touch-icon" type="image/png" href="{{ asset('assets/img/favicon.svg') }}">
+
         @yield('template_linked_css')
 
         <style type="text/css">

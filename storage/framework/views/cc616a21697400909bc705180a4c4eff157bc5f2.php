@@ -48,7 +48,7 @@
                                     <th><?php echo e(__('販売店名称')); ?></th>
                                     <td>
                                         <div class="form-input">
-                                            <input type="text" class="form-control<?php echo e($errors->has('company') ? ' is-invalid' : ''); ?>" name="company" value="<?php echo e($user->company); ?>" placeholder="<?php echo e(__('例）株式会社株式会社ティーエムユニオン')); ?>">
+                                            <input type="text" class="form-control<?php echo e($errors->has('company') ? ' is-invalid' : ''); ?>" name="company" value="<?php echo e($user->company); ?>" placeholder="<?php echo e(__('例）株式会社カーポートソーラーシステム')); ?>">
                                             <?php if($errors->has('company')): ?>
                                                 <p class="invalid-feedback"><?php echo e($errors->first('company')); ?></p>
                                             <?php endif; ?>

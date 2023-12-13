@@ -159,10 +159,6 @@ php artisan vendor:publish --tag=laravel-email-database-log-migration
 
 ##### Seeded Users
 
-|Email|Password|Access|
-|:------------|:------------|:------------|
-|user@user.com|password|User Access|
-|admin@admin.com|password|Admin Access|
 
 ##### Themes Seed List
   * [ThemesTableSeeder](https://github.com/jeremykenedy/laravel-auth/blob/master/database/seeds/ThemesTableSeeder.php)

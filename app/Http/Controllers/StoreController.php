@@ -67,7 +67,7 @@ class StoreController extends Controller
                 'zipcode' => 'required|postal_code:JP|max:255',
                 'address1' => 'required|max:255',
                 'phone' => 'required|min:10',
-                'email' => 'required|email|max:255',
+                'email' => 'required|email|max:255|unique:users',
                 'name' => 'required|max:255',
                 'role' => 'required',
                 'bank_name' => 'required|max:255',
