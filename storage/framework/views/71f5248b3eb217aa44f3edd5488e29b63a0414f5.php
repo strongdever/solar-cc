@@ -77,64 +77,71 @@
                 </div>
             <?php endif; ?> -->
             <h4 class="caption mb-16 mb-sp-12">全カーポート 当月請求データ総計</h4>
-            <?php if( !empty( $selectedInvoiceData ) ): ?>
-            <div class="describe-panel mb-50 mb-sp-30">
-                <?php if( !empty( $invoiceIDs ) ): ?>
-                <select name="invoice_id" id="invoice_id" class="invoice-select">
-                    <?php $__currentLoopData = $invoiceIDs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $invoiceID): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <?php
-                    $year = explode('-', $invoiceID)[0];
-                    $month = explode('-', $invoiceID)[1];
-                    $currentUser = Auth::user();
-                    $label = $currentUser->term->get_invoice_label($year, $month);
-                    $period = $currentUser->term->get_invoice_period($year, $month);
-                    ?>
-                    <option value="<?php echo e($invoiceID); ?>" <?php echo e($searchData['invoice_id'] == $invoiceID ? 'selected="selected"' : ''); ?>><?php echo $label . '（' . $period . '）'; ?></option>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </select>
-                <?php endif; ?>
-                <div class="inner-row">
-                    <div class="inner-left">
-                        <ul class="describe-list">
-                            <li>
-                                <div class="describe-item">
-                                    <h4 class="label"><?php echo e(__('件数')); ?></h4>
-                                    <div class="value"><strong><?php echo number_format( $selectedInvoiceData['count'], 0 ); ?></strong><small><?php echo e(__('件')); ?></small></div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="describe-item">
-                                    <h4 class="label"><?php echo e(__('総自家消費電力量')); ?></h4>
-                                    <div class="value"><strong><?php echo number_format( $selectedInvoiceData['amount'], 4 ); ?></strong><small><?php echo e(__('kWh')); ?></small></div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="describe-item">
-                                    <h4 class="label"><?php echo e(__('総請求額')); ?></h4>
-                                    <div class="value"><strong><?php echo number_format( round($selectedInvoiceData['price'], 0), 0 ); ?></strong><small><?php echo e(__('円')); ?></small></div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="inner-right">
-                        <div class="download-action">
-                            <?php echo Form::open(array('route' => 'invoice.zipfile', 'method' => 'POST', 'role' => 'form', 'class' => '')); ?>
+            <?php if(count( $powerInvoices ) > 0): ?>
+                <?php if( !empty( $selectedInvoiceData ) ): ?>
+                <div class="describe-panel mb-50 mb-sp-30">
+                    <?php if( !empty( $invoiceIDs ) ): ?>
+                    <select name="invoice_id" id="invoice_id" class="invoice-select">
+                        <?php $__currentLoopData = $invoiceIDs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $invoiceID): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php
+                        $year = explode('-', $invoiceID)[0];
+                        $month = explode('-', $invoiceID)[1];
+                        $currentUser = Auth::user();
+                        $label = $currentUser->term->get_invoice_label($year, $month);
+                        $period = $currentUser->term->get_invoice_period($year, $month);
+                        ?>
+                        <option value="<?php echo e($invoiceID); ?>" <?php echo e($searchData['invoice_id'] == $invoiceID ? 'selected="selected"' : ''); ?>><?php echo $label . '（' . $period . '）'; ?></option>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </select>
+                    <?php endif; ?>
+                    <div class="inner-row">
+                        <div class="inner-left">
+                            <ul class="describe-list">
+                                <li>
+                                    <div class="describe-item">
+                                        <h4 class="label"><?php echo e(__('件数')); ?></h4>
+                                        <div class="value"><strong><?php echo number_format( $selectedInvoiceData['count'], 0 ); ?></strong><small><?php echo e(__('件')); ?></small></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="describe-item">
+                                        <h4 class="label"><?php echo e(__('総自家消費電力量')); ?></h4>
+                                        <div class="value"><strong><?php echo number_format( $selectedInvoiceData['amount'], 4 ); ?></strong><small><?php echo e(__('kWh')); ?></small></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="describe-item">
+                                        <h4 class="label"><?php echo e(__('総請求額')); ?></h4>
+                                        <div class="value"><strong><?php echo number_format( round($selectedInvoiceData['price'], 0), 0 ); ?></strong><small><?php echo e(__('円')); ?></small></div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="inner-right">
+                            <div class="download-action">
+                                <?php echo Form::open(array('route' => 'invoice.zipfile', 'method' => 'POST', 'role' => 'form', 'class' => '')); ?>
 
-                                <?php echo csrf_field(); ?>
+                                    <?php echo csrf_field(); ?>
 
-                                <?php echo Form::hidden('uuidsJson', $selectedInvoiceData['uuidJson']); ?>
+                                    <?php echo Form::hidden('uuidsJson', $selectedInvoiceData['uuidJson']); ?>
 
-                                
-                                <?php echo Form::button('<i class="icon-download" aria-hidden="true"></i><span>一括ダウンロード</span>', array('class' => 'link-btn','type' => 'submit' )); ?>
+                                    
+                                    <?php echo Form::button('<i class="icon-download" aria-hidden="true"></i><span>一括ダウンロード</span>', array('class' => 'link-btn','type' => 'submit' )); ?>
 
-                            <?php echo Form::close(); ?>
+                                <?php echo Form::close(); ?>
 
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <?php endif; ?>
+            <?php else: ?>
+                <div class="describe-panel mb-50 mb-sp-30">
+                    <div class="title"><?php echo e(__('データがありません。')); ?></div>
+                    <div class="content"><?php echo __('電力データ登録画面から、電力データをアップロードしてください。<br>請求データとしてこちらに反映されます。'); ?></div>
+                </div>
             <?php endif; ?>
-            
+
             <h4 class="caption"><?php echo e(__('カーポート別 当月請求データ一覧')); ?></h4>
             <div class="table-responsive requests-table">
                 <table class="table table-sm data-table">

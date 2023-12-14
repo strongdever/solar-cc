@@ -14,57 +14,64 @@
         </div>
         <div class="card-body">
             <h4 class="caption mb-16 mb-sp-12">全カーポート 当月請求データ総計</h4>
-            @if( !empty( $selectedInvoiceData ) )
-            <div class="describe-panel mb-50 mb-sp-30">
-                @if( !empty( $invoiceIDs ) )
-                <select name="invoice_id" id="invoice_id" class="invoice-select">
-                    @foreach( $invoiceIDs as $invoiceID )
-                    @php
-                    $year = explode('-', $invoiceID)[0];
-                    $month = explode('-', $invoiceID)[1];
-                    $currentUser = Auth::user();
-                    $label = $currentUser->term->get_invoice_label($year, $month);
-                    $period = $currentUser->term->get_invoice_period($year, $month);
-                    @endphp
-                    <option value="{{ $invoiceID }}" {{ $searchData['invoice_id'] == $invoiceID ? 'selected="selected"' : '' }}>{!! $label . '（' . $period . '）' !!}</option>
-                    @endforeach
-                </select>
-                @endif
-                <div class="inner-row">
-                    <div class="inner-left">
-                        <ul class="describe-list">
-                            <li>
-                                <div class="describe-item">
-                                    <h4 class="label">{{ __('件数') }}</h4>
-                                    <div class="value"><strong>{!! number_format( $selectedInvoiceData['count'], 0 ) !!}</strong><small>{{ __('件') }}</small></div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="describe-item">
-                                    <h4 class="label">{{ __('総自家消費電力量') }}</h4>
-                                    <div class="value"><strong>{!! number_format( $selectedInvoiceData['amount'], 4 ) !!}</strong><small>{{ __('kWh') }}</small></div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="describe-item">
-                                    <h4 class="label">{{ __('総請求額') }}</h4>
-                                    <div class="value"><strong>{!! number_format( round($selectedInvoiceData['price'], 0), 0 ) !!}</strong><small>{{ __('円') }}</small></div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="inner-right">
-                        <div class="download-action">
-                            {!! Form::open(array('route' => 'invoice.zipfile', 'method' => 'POST', 'role' => 'form', 'class' => '')) !!}
-                                {!! csrf_field() !!}
-                                {!! Form::hidden('uuidsJson', $selectedInvoiceData['uuidJson']) !!}
-                                
-                                {!! Form::button('<i class="icon-download" aria-hidden="true"></i><span>一括ダウンロード</span>', array('class' => 'link-btn','type' => 'submit' )) !!}
-                            {!! Form::close() !!}
+            @if(count( $powerInvoices ) > 0)
+                @if( !empty( $selectedInvoiceData ) )
+                <div class="describe-panel mb-50 mb-sp-30">
+                    @if( !empty( $invoiceIDs ) )
+                    <select name="invoice_id" id="invoice_id" class="invoice-select">
+                        @foreach( $invoiceIDs as $invoiceID )
+                        @php
+                        $year = explode('-', $invoiceID)[0];
+                        $month = explode('-', $invoiceID)[1];
+                        $currentUser = Auth::user();
+                        $label = $currentUser->term->get_invoice_label($year, $month);
+                        $period = $currentUser->term->get_invoice_period($year, $month);
+                        @endphp
+                        <option value="{{ $invoiceID }}" {{ $searchData['invoice_id'] == $invoiceID ? 'selected="selected"' : '' }}>{!! $label . '（' . $period . '）' !!}</option>
+                        @endforeach
+                    </select>
+                    @endif
+                    <div class="inner-row">
+                        <div class="inner-left">
+                            <ul class="describe-list">
+                                <li>
+                                    <div class="describe-item">
+                                        <h4 class="label">{{ __('件数') }}</h4>
+                                        <div class="value"><strong>{!! number_format( $selectedInvoiceData['count'], 0 ) !!}</strong><small>{{ __('件') }}</small></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="describe-item">
+                                        <h4 class="label">{{ __('総自家消費電力量') }}</h4>
+                                        <div class="value"><strong>{!! number_format( $selectedInvoiceData['amount'], 4 ) !!}</strong><small>{{ __('kWh') }}</small></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="describe-item">
+                                        <h4 class="label">{{ __('総請求額') }}</h4>
+                                        <div class="value"><strong>{!! number_format( round($selectedInvoiceData['price'], 0), 0 ) !!}</strong><small>{{ __('円') }}</small></div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="inner-right">
+                            <div class="download-action">
+                                {!! Form::open(array('route' => 'invoice.zipfile', 'method' => 'POST', 'role' => 'form', 'class' => '')) !!}
+                                    {!! csrf_field() !!}
+                                    {!! Form::hidden('uuidsJson', $selectedInvoiceData['uuidJson']) !!}
+                                    
+                                    {!! Form::button('<i class="icon-download" aria-hidden="true"></i><span>一括ダウンロード</span>', array('class' => 'link-btn','type' => 'submit' )) !!}
+                                {!! Form::close() !!}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                @endif
+            @else
+                <div class="describe-panel mb-50 mb-sp-30">
+                    <div class="title">{{ __('データがありません。') }}</div>
+                    <div class="content">{!! __('電力データ登録画面から、電力データをアップロードしてください。<br>請求データとしてこちらに反映されます。') !!}</div>
+                </div>
             @endif
             
             <h4 class="caption">{{ __('カーポート別 当月請求データ一覧') }}</h4>

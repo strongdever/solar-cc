@@ -129,7 +129,8 @@
                                                 <option value=""><?php echo e(trans('forms.create_user_ph_role')); ?></option>
                                                 <?php if($roles): ?>
                                                     <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <option value="<?php echo e($role->id); ?>"><?php echo e($role->name); ?></option>
+                                                    <!-- <option value="<?php echo e($role->id); ?>"><?php echo e($role->name); ?></option> -->
+                                                    <option value="<?php echo e($role->id); ?>"<?php echo e(old('role') == $role->id ? ' selected' : ''); ?>><?php echo e($role->name); ?></option>
                                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 <?php endif; ?>
                                             </select>
@@ -156,19 +157,22 @@
                                             <ul class="choice-group">
                                                 <li>
                                                     <label class="form-radiobox">10日
-                                                        <input type="radio" name="deadline" value="10">
+                                                        <!-- <input type="radio" name="deadline" value="10"> -->
+                                                        <input type="radio" name="deadline" value="10"<?php echo e(old('deadline') == '10' ? ' checked' : ''); ?>>
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </li>
                                                 <li>
                                                     <label class="form-radiobox">20日
-                                                        <input type="radio" name="deadline" value="20">
+                                                        <!-- <input type="radio" name="deadline" value="20"> -->
+                                                        <input type="radio" name="deadline" value="20"<?php echo e(old('deadline') == '20' ? ' checked' : ''); ?>>
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </li>
                                                 <li>
                                                     <label class="form-radiobox">末日
-                                                        <input type="radio" name="deadline" value="30">
+                                                        <!-- <input type="radio" name="deadline" value="30"> -->
+                                                        <input type="radio" name="deadline" value="30"<?php echo e(old('deadline') == '30' ? ' checked' : ''); ?>>
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </li>

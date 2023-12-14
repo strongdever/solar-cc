@@ -125,7 +125,8 @@
                                                 <option value="">{{ trans('forms.create_user_ph_role') }}</option>
                                                 @if ($roles)
                                                     @foreach($roles as $role)
-                                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                                    <!-- <option value="{{ $role->id }}">{{ $role->name }}</option> -->
+                                                    <option value="{{ $role->id }}"{{ old('role') == $role->id ? ' selected' : '' }}>{{ $role->name }}</option>
                                                     @endforeach
                                                 @endif
                                             </select>
@@ -152,19 +153,22 @@
                                             <ul class="choice-group">
                                                 <li>
                                                     <label class="form-radiobox">10日
-                                                        <input type="radio" name="deadline" value="10">
+                                                        <!-- <input type="radio" name="deadline" value="10"> -->
+                                                        <input type="radio" name="deadline" value="10"{{ old('deadline') == '10' ? ' checked' : '' }}>
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </li>
                                                 <li>
                                                     <label class="form-radiobox">20日
-                                                        <input type="radio" name="deadline" value="20">
+                                                        <!-- <input type="radio" name="deadline" value="20"> -->
+                                                        <input type="radio" name="deadline" value="20"{{ old('deadline') == '20' ? ' checked' : '' }}>
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </li>
                                                 <li>
                                                     <label class="form-radiobox">末日
-                                                        <input type="radio" name="deadline" value="30">
+                                                        <!-- <input type="radio" name="deadline" value="30"> -->
+                                                        <input type="radio" name="deadline" value="30"{{ old('deadline') == '30' ? ' checked' : '' }}>
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </li>
